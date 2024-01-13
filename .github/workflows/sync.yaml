@@ -1,0 +1,22 @@
+name: Sync
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install rclone
+        run: sudo -v ; curl https://rclone.org/install.sh | sudo bash
+
+      - name: Setup environment
+        run: |
+            mkdir -p "$HOME/.config/rclone"
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 20000 -in config -out "$HOME/.config/rclone/rclone.conf" -k "${{ secrets.ENC_KEY }}"
+
+      - name: Sync
+        run: rclone size "onedrive-crypt-1:Ezlo backup"

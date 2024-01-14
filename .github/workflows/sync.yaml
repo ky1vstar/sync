@@ -25,4 +25,4 @@ jobs:
             sudo ./setup.sh -q
 
       - name: Sync
-        run: rclone sync "gdrive:Ezlo backup/macOS" "onedrive-crypt-1:Ezlo backup/macOS" --progress > >(logger -t rclone) 2>&1
+        run: rclone sync "gdrive:Ezlo backup/Series" "onedrive-crypt-1:Ezlo backup/Series" --progress > >(logger -t rclone) 2>&1

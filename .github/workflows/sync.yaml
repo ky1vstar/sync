@@ -10,19 +10,27 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Check workflows
+        id: check_workflows
+        run: echo "::set-output name=number_of_workflows::$(gh run list --workflow sync.yaml -s in_progress --json status --jq length)"
+
       - name: Install rclone
+        if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: sudo -v ; curl https://rclone.org/install.sh | sudo bash
 
       - name: Setup environment
+        if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: |
             mkdir -p "$HOME/.config/rclone"
             openssl enc -d -aes-256-cbc -pbkdf2 -iter 20000 -in config -out "$HOME/.config/rclone/rclone.conf" -k "${{ secrets.ENC_KEY }}"
 
       - name: Setup logger
+        if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: |
             wget -q -O setup.sh --header="X-Papertrail-Token: ${{ secrets.PAPERTRAIL_TOKEN }}" https://papertrailapp.com/destinations/37404576/setup.sh
             chmod +x setup.sh
             sudo ./setup.sh -q
 
       - name: Sync
-        run: rclone sync "gdrive:Ezlo backup/Series" "onedrive-crypt-1:Ezlo backup/Series" --progress > >(logger -t rclone) 2>&1
+        if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+        run: rclone sync "gdrive:Ezlo backup/Series" "onedrive-crypt-1:Ezlo backup/Series" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone) 2>&1

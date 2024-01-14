@@ -15,6 +15,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          gh run list --workflow sync.yaml
           gh run list --workflow sync.yaml -s in_progress --json status --jq length
           echo "::set-output name=number_of_workflows::$(gh run list --workflow sync.yaml -s in_progress --json status --jq length)"
 

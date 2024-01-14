@@ -12,7 +12,11 @@ jobs:
 
       - name: Check workflows
         id: check_workflows
-        run: echo "::set-output name=number_of_workflows::$(gh run list --workflow sync.yaml -s in_progress --json status --jq length)"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run list --workflow sync.yaml -s in_progress --json status --jq length
+          echo "::set-output name=number_of_workflows::$(gh run list --workflow sync.yaml -s in_progress --json status --jq length)"
 
       - name: Install rclone
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}

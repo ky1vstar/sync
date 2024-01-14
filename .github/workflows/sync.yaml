@@ -25,6 +25,8 @@ jobs:
       - name: Setup environment
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: |
+            echo ${{ steps.check_workflows.outputs.number_of_workflows }}
+            echo ${{ fromJSON(steps.check_workflows.outputs.number_of_workflows) <= 1 }}
             mkdir -p "$HOME/.config/rclone"
             openssl enc -d -aes-256-cbc -pbkdf2 -iter 20000 -in config -out "$HOME/.config/rclone/rclone.conf" -k "${{ secrets.ENC_KEY }}"
 
@@ -35,6 +37,6 @@ jobs:
             chmod +x setup.sh
             sudo ./setup.sh -q
 
-      - name: Sync
-        if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
-        run: rclone sync "gdrive:Ezlo backup/Series" "onedrive-crypt-1:Ezlo backup/Series" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone) 2>&1
+      # - name: Sync
+      #   if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+      #   run: rclone sync "gdrive:Ezlo backup/Series" "onedrive-crypt-1:Ezlo backup/Series" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone) 2>&1

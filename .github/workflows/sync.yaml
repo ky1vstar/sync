@@ -40,4 +40,4 @@ jobs:
 
       - name: Sync
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
-        run: rclone sync "gdrive:Ezlo backup/Series" "onedrive-crypt-1:Ezlo backup/Series" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone) 2>&1
+        run: rclone sync "gdrive:Ezlo backup/Films" "onedrive-crypt-1:Ezlo backup/Films" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone) 2>&1

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Check workflows
         id: check_workflows
@@ -21,9 +21,19 @@ jobs:
           gh run list --workflow sync.yaml
           echo "number_of_workflows=$(gh run list --workflow sync.yaml -s in_progress --json status --jq length)" >> $GITHUB_OUTPUT
 
+      - name: Install Go
+        if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.21
+          check-latest: true
+      
       - name: Install rclone
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
-        run: sudo -v ; curl https://rclone.org/install.sh | sudo bash
+        run: |
+            git clone -b ky1vstar --single-branch https://github.com/ky1vstar/rclone
+            cd rclone
+            go build -o /usr/local/bin/rclone
 
       - name: Setup environment
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
@@ -40,4 +50,5 @@ jobs:
 
       - name: Sync
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
-        run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft --max-size=160G > >(logger -t rclone) 2>&1 || true
+        run: rclone about telebox-crypt-1:
+        # run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft --max-size=160G > >(logger -t rclone) 2>&1 || true

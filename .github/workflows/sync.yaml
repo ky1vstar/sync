@@ -50,4 +50,4 @@ jobs:
 
       - name: Sync
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
-        run: rclone sync "gdrive:Ezlo backup/Films" "telebox-crypt-1:Ezlo backup/Films" -vv --progress --max-duration=2h --cutoff-mode=soft --max-size=160G > >(logger -t rclone) 2>&1 || true
+        run: rclone sync "gdrive:Ezlo backup" "telebox-crypt-1:Ezlo backup" -vv --progress --max-duration=2h --cutoff-mode=soft --max-size=160G > >(logger -t rclone) 2>&1 || true

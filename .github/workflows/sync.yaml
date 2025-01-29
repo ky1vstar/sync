@@ -35,13 +35,13 @@ jobs:
         #     git clone -b ky1vstar --single-branch https://github.com/ky1vstar/rclone
         #     cd rclone
         #     go build -o /usr/local/bin/rclone
-        #     echo -n "${{ secrets.RCLONE_CONFIG }}" | base64 -d > "$HOME/.config/rclone/rclone.config"
+        #     
 
       - name: Setup environment
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: |
             mkdir -p "$HOME/.config/rclone"
-            echo -n "${{ secrets.RCLONE_CONFIG }}" > "$HOME/.config/rclone/rclone.conf"
+            echo -n "${{ secrets.RCLONE_CONFIG }}" | base64 -d > "$HOME/.config/rclone/rclone.conf"
 
       - name: Setup logger
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}

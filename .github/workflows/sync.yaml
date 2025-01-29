@@ -40,7 +40,8 @@ jobs:
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: |
             mkdir -p "$HOME/.config/rclone"
-            echo -e "${{ secrets.RCLONE_CONFIG }}" > "$HOME/.config/rclone/rclone.config"
+            # echo -n "${{ secrets.RCLONE_CONFIG }}" | base64 -d > "$HOME/.config/rclone/rclone.config"
+            echo -n "${{ secrets.RCLONE_CONFIG }}" > "$HOME/.config/rclone/rclone.config"
 
       - name: Setup logger
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}

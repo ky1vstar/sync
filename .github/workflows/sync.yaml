@@ -2,7 +2,7 @@ name: Sync
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 jobs:
@@ -52,4 +52,5 @@ jobs:
 
       - name: Sync
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
-        run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" -vv --progress --max-duration=2h --cutoff-mode=soft --max-size=160G > >(logger -t rclone) 2>&1 || true
+        run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone) 2>&1 || true
+        # run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" -vv --progress --max-duration=2h --cutoff-mode=soft --max-size=160G > >(logger -t rclone) 2>&1 || true

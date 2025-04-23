@@ -46,10 +46,11 @@ jobs:
       - name: Setup logger
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: |
-            wget -qO- https://telemetry.betterstack.com/syslog-ng/${{ secrets.BETTERSTACK_TOKEN }} | sh \
-            systemctl restart syslog-ng
+            curl -sSL https://telemetry.betterstack.com/setup-vector/ubuntu/${{ secrets.BETTERSTACK_TOKEN }} \
+            -o /tmp/setup-vector.sh && \
+            bash /tmp/setup-vector.sh
 
       - name: Sync
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
-        run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-2:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone) 2>&1 || true
+        run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-2:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft > >(vector) 2>&1 || true
         # run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" -vv --progress --max-duration=2h --cutoff-mode=soft --max-size=160G > >(logger -t rclone) 2>&1 || true

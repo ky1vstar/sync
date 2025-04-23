@@ -46,9 +46,8 @@ jobs:
       - name: Setup logger
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: |
-            curl -sSL https://telemetry.betterstack.com/setup-vector/ubuntu/${{ secrets.BETTERSTACK_TOKEN }} \
-            -o /tmp/setup-vector.sh && \
-            bash /tmp/setup-vector.sh
+            wget -qO- https://telemetry.betterstack.com/syslog-ng/${{ secrets.BETTERSTACK_TOKEN }} | sh \
+            systemctl restart syslog-ng
 
       - name: Sync
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}

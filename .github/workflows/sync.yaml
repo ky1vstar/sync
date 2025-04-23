@@ -53,10 +53,10 @@ jobs:
       - name: Setup logger
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: |
-            apt-get install rsyslog-gnutls
+            sudo apt-get install rsyslog-gnutls
             curl -sSL https://telemetry.betterstack.com/rsyslog/${{ secrets.BETTERSTACK_TOKEN }} -o /tmp/setup-rsyslog.sh
-            sh /tmp/setup-rsyslog.sh
-            systemctl restart rsyslog
+            sudo sh /tmp/setup-rsyslog.sh
+            sudo systemctl restart rsyslog
 
       - name: Sync
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}

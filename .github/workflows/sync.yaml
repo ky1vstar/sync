@@ -43,14 +43,20 @@ jobs:
             mkdir -p "$HOME/.config/rclone"
             echo -n "${{ secrets.RCLONE_CONFIG }}" | base64 -d > "$HOME/.config/rclone/rclone.conf"
 
+      # - name: Setup logger
+      #   if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+      #   run: |
+      #       wget -q -O setup.sh --header="X-Papertrail-Token: ${{ secrets.PAPERTRAIL_TOKEN }}" https://papertrailapp.com/destinations/37404576/setup.sh
+      #       chmod +x setup.sh
+      #       sudo ./setup.sh -q
+
       - name: Setup logger
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: |
-            curl -sSL https://telemetry.betterstack.com/setup-vector/ubuntu/${{ secrets.BETTERSTACK_TOKEN }} \
-            -o /tmp/setup-vector.sh && \
-            bash /tmp/setup-vector.sh
+            apt-get install rsyslog-gnutls \
+            wget -qO- https://telemetry.betterstack.com/rsyslog/${{ secrets.BETTERSTACK_TOKEN }} | sh
 
       - name: Sync
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
-        run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-2:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft > >(sudo vector) 2>&1 || true
+        run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-2:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone) 2>&1 || true
         # run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" -vv --progress --max-duration=2h --cutoff-mode=soft --max-size=160G > >(logger -t rclone) 2>&1 || true

@@ -21,21 +21,26 @@ jobs:
           gh run list --workflow sync.yaml
           echo "number_of_workflows=$(gh run list --workflow sync.yaml -s in_progress --json status --jq length)" >> $GITHUB_OUTPUT
 
-      # - name: Install Go
-      #   if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
-      #   uses: actions/setup-go@v5
-      #   with:
-      #     go-version: 1.21
-      #     check-latest: true
+      - name: Install Go
+        if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.21
+          check-latest: true
       
       - name: Install rclone
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
-        run: sudo -v ; curl https://rclone.org/install.sh | sudo bash
-        # run: |
-        #     git clone -b ky1vstar --single-branch https://github.com/ky1vstar/rclone
-        #     cd rclone
-        #     go build -o /usr/local/bin/rclone
-        #     
+        # run: sudo -v ; curl https://rclone.org/install.sh | sudo bash
+        run: |
+            git clone --depth 1 --branch v1.69.1 https://github.com/rclone/rclone
+            cd rclone
+            go build -o /usr/local/bin/rclone
+            
+            git clone --depth 1 https://github.com/ky1vstar/rclone-telebox-plugin
+            cd rclone-telebox-plugin
+            go mod edit -replace "github.com/rclone/rclone=${{ github.workspace }}/rclone"
+            go build -buildmode=plugin -o librcloneplugin_telebox.so
+            echo "RCLONE_PLUGIN_PATH=$PWD" >> $GITHUB_ENV
 
       - name: Setup environment
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
@@ -60,5 +65,7 @@ jobs:
 
       - name: Sync
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
-        run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft --max-size=100G > >(logger -t rclone) 2>&1 || true
+        run: |
+            rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone) 2>&1 || true
+            rclone sync "gdrive:Ezlo backup" "telebox-crypt-1:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone) 2>&1 || true
         # run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" -vv --progress --max-duration=2h --cutoff-mode=soft --max-size=160G > >(logger -t rclone) 2>&1 || true

@@ -45,7 +45,7 @@ jobs:
             docker pull ghcr.io/ky1vstar/rclone:master
             cat >/usr/local/bin/rclone <<EOL
             #/usr/bin/env bash
-            exec docker run --rm -t -v "$HOME/.config/rclone":/config/rclone ghcr.io/ky1vstar/rclone:master "\$@"
+            exec docker run --rm -t -v "\$HOME/.config/rclone":/config/rclone ghcr.io/ky1vstar/rclone:master "\$@"
             EOL
             chmod +x /usr/local/bin/rclone
             cat /usr/local/bin/rclone

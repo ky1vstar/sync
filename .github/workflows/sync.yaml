@@ -48,6 +48,7 @@ jobs:
             exec docker run --rm -i -v "$HOME/.config/rclone":/config/rclone ghcr.io/ky1vstar/rclone:master "$@"
             EOL
             chmod +x /usr/local/bin/rclone
+            rclone help backend telebox
 
       - name: Setup environment
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}

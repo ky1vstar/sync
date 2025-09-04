@@ -75,7 +75,7 @@ jobs:
         run: |
             rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone1) 2>&1 &
             PID1=$!
-            rclone sync "gdrive:Ezlo backup" "telebox-crypt-1:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone2) 2>& || true
+            rclone sync "gdrive:Ezlo backup" "telebox-crypt-1:Ezlo backup" --progress --max-duration=2h --cutoff-mode=soft > >(logger -t rclone2) 2>&1 &
             PID2=$!
             wait $PID1 || true
             wait $PID2 || true

@@ -49,11 +49,17 @@ jobs:
             EOL
             chmod +x /usr/local/bin/rclone
 
+      # - name: Setup environment
+      #   if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+      #   run: |
+      #       mkdir -p "$HOME/.config/rclone"
+      #       echo -n "${{ secrets.RCLONE_CONFIG }}" | base64 -d > "$HOME/.config/rclone/rclone.conf"
+
       - name: Setup environment
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: |
             mkdir -p "$HOME/.config/rclone"
-            echo -n "${{ secrets.RCLONE_CONFIG }}" | base64 -d > "$HOME/.config/rclone/rclone.conf"
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 20000 -in config -out "$HOME/.config/rclone/rclone.conf" -k "${{ secrets.ENC_KEY }}"
 
       # - name: Setup logger
       #   if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}

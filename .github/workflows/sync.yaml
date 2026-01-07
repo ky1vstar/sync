@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         config:
-          - remotes: gdrive:Ezlo backup/Movies>onedrive-crypt-1:Ezlo backup/Movies|gdrive:Ezlo backup>telebox-crypt-1:Ezlo backup
+          - remotes: gdrive:Ezlo backup/Films>onedrive-crypt-1:Ezlo backup/Films|gdrive:Ezlo backup>telebox-crypt-1:Ezlo backup
             logger_tags: rclone1|rclone2
           - remotes: gdrive:Ezlo backup/Series>onedrive-crypt-1:Ezlo backup/Series
             logger_tags: rclone3

@@ -7,6 +7,14 @@ on:
 
 jobs:
   sync:
+    strategy:
+      matrix:
+        config:
+          - remotes: gdrive:Ezlo backup/Movies>onedrive-crypt-1:Ezlo backup/Movies|gdrive:Ezlo backup>telebox-crypt-1:Ezlo backup
+            logger_tags: rclone1|rclone2
+          - remotes: gdrive:Ezlo backup/Series>onedrive-crypt-1:Ezlo backup/Series
+            logger_tags: rclone3
+
     runs-on: ubuntu-latest
 
     steps:
@@ -79,10 +87,17 @@ jobs:
       - name: Sync
         if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
         run: |
-            rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" --create-empty-src-dirs --progress --stats 10s --max-duration=2h --cutoff-mode=soft > >(logger -t rclone1) 2>&1 &
-            PID1=$!
-            rclone sync "gdrive:Ezlo backup" "telebox-crypt-1:Ezlo backup" --create-empty-src-dirs --progress --stats 10s --max-duration=2h --cutoff-mode=soft > >(logger -t rclone2) 2>&1 &
-            PID2=$!
-            wait $PID1 || true
-            wait $PID2 || true
-        # run: rclone sync "gdrive:Ezlo backup" "onedrive-crypt-1:Ezlo backup" -vv --progress --max-duration=2h --cutoff-mode=soft --max-size=160G > >(logger -t rclone) 2>&1 || true
+            IFS='|' read -ra REMOTES <<< "${{ matrix.config.remotes }}"
+            IFS='|' read -ra TAGS <<< "${{ matrix.config.logger_tags }}"
+            
+            PIDS=()
+            for i in "${!REMOTES[@]}"; do
+              IFS='>' read -r SRC DST <<< "${REMOTES[$i]}"
+              TAG="${TAGS[$i]}"
+              rclone sync "$SRC" "$DST" --create-empty-src-dirs --progress --stats 10s --max-duration=2h --cutoff-mode=soft > >(logger -t "$TAG") 2>&1 &
+              PIDS+=($!)
+            done
+            
+            for PID in "${PIDS[@]}"; do
+              wait $PID || true
+            done

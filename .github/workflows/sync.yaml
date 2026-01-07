@@ -25,19 +25,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          sleep 10
           gh run list --workflow sync.yaml
-          echo "number_of_workflows=$(gh run list --workflow sync.yaml -s in_progress --json status --jq length)" >> $GITHUB_OUTPUT
+          echo "number_of_workflows=$(gh run list --workflow sync.yaml -s in_progress --json databaseId --jq 'map(select(.databaseId != ${{ github.run_id }})) | length')" >> $GITHUB_OUTPUT
 
       # - name: Install Go
-      #   if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+      #   if: ${{ steps.check_workflows.outputs.number_of_workflows == 0 }}
       #   uses: actions/setup-go@v5
       #   with:
       #     go-version: 1.21
       #     check-latest: true
       
       - name: Install rclone
-        if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+        if: ${{ steps.check_workflows.outputs.number_of_workflows == 0 }}
         # run: sudo -v ; curl https://rclone.org/install.sh | sudo bash
         # run: |
         #     git clone --depth 1 --branch v1.69.1 https://github.com/rclone/rclone
@@ -58,26 +57,26 @@ jobs:
             chmod +x /usr/local/bin/rclone
 
       # - name: Setup environment
-      #   if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+      #   if: ${{ steps.check_workflows.outputs.number_of_workflows == 0 }}
       #   run: |
       #       mkdir -p "$HOME/.config/rclone"
       #       echo -n "${{ secrets.RCLONE_CONFIG }}" | base64 -d > "$HOME/.config/rclone/rclone.conf"
 
       - name: Setup environment
-        if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+        if: ${{ steps.check_workflows.outputs.number_of_workflows == 0 }}
         run: |
             mkdir -p "$HOME/.config/rclone"
             openssl enc -d -aes-256-cbc -pbkdf2 -iter 20000 -in config -out "$HOME/.config/rclone/rclone.conf" -k "${{ secrets.ENC_KEY }}"
 
       # - name: Setup logger
-      #   if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+      #   if: ${{ steps.check_workflows.outputs.number_of_workflows == 0 }}
       #   run: |
       #       wget -q -O setup.sh --header="X-Papertrail-Token: ${{ secrets.PAPERTRAIL_TOKEN }}" https://papertrailapp.com/destinations/37404576/setup.sh
       #       chmod +x setup.sh
       #       sudo ./setup.sh -q
 
       - name: Setup logger
-        if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+        if: ${{ steps.check_workflows.outputs.number_of_workflows == 0 }}
         run: |
             sudo apt-get install rsyslog-gnutls
             curl -sSL https://telemetry.betterstack.com/rsyslog/${{ secrets.BETTERSTACK_TOKEN }} -o /tmp/setup-rsyslog.sh
@@ -85,7 +84,7 @@ jobs:
             sudo systemctl restart rsyslog
 
       - name: Sync
-        if: ${{ steps.check_workflows.outputs.number_of_workflows <= 1 }}
+        if: ${{ steps.check_workflows.outputs.number_of_workflows == 0 }}
         run: |
             IFS='|' read -ra REMOTES <<< "${{ matrix.config.remotes }}"
             IFS='|' read -ra TAGS <<< "${{ matrix.config.logger_tags }}"

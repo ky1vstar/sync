@@ -1,0 +1,15 @@
+name: Sync 2
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    uses: ./.github/workflows/sync-reuse.yaml
+    with:
+      workflow: sync-2.yaml
+      remotes: gdrive:Ezlo backup/Series>onedrive-crypt-1:Ezlo backup/Series
+      logger_tags: rclone3
+    secrets: inherit

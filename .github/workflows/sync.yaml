@@ -10,6 +10,6 @@ jobs:
     uses: ./.github/workflows/sync-reuse.yaml
     with:
       workflow: sync.yaml
-      remotes: gdrive:Ezlo backup>telebox-crypt-1:Ezlo backup
-      logger_tags: rclone2
+      remotes: gdrive:Ezlo backup>onedrive-crypt-1:Ezlo backup|gdrive:Ezlo backup>telebox-crypt-1:Ezlo backup
+      logger_tags: rclone1|rclone2
     secrets: inherit

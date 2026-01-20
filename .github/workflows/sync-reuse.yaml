@@ -96,7 +96,7 @@ jobs:
             for i in "${!REMOTES[@]}"; do
               IFS='>' read -r SRC DST <<< "${REMOTES[$i]}"
               TAG="${TAGS[$i]}"
-              rclone sync "$SRC" "$DST" --create-empty-src-dirs --progress --stats 10s --max-duration=2h --cutoff-mode=soft > >(logger -t "$TAG") 2>&1 &
+              rclone sync "$SRC" "$DST" --create-empty-src-dirs --progress --stats 10s --max-duration=2h --cutoff-mode=soft --drive-acknowledge-abuse > >(logger -t "$TAG") 2>&1 &
               PIDS+=($!)
             done
             

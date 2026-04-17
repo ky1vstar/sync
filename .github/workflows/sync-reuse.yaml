@@ -81,6 +81,7 @@ jobs:
       - name: Setup logger
         if: ${{ steps.check_workflows.outputs.number_of_workflows == 0 }}
         run: |
+            sudo apt-get -y update
             sudo apt-get install rsyslog-gnutls
             curl -sSL https://telemetry.betterstack.com/rsyslog/${{ secrets.BETTERSTACK_TOKEN }} -o /tmp/setup-rsyslog.sh
             sudo sh /tmp/setup-rsyslog.sh
